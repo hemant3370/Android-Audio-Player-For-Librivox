@@ -16,6 +16,8 @@
 
 package com.example.android.AudioArchive.model;
 
+import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.util.Log;
 
@@ -25,12 +27,14 @@ import com.einmalfel.earl.EarlParser;
 import com.einmalfel.earl.Feed;
 import com.einmalfel.earl.RSSFeed;
 import com.einmalfel.earl.RSSItem;
+import com.example.android.AudioArchive.utils.DiskLruCache;
 import com.example.android.AudioArchive.utils.LogHelper;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -135,7 +139,11 @@ return tracks.iterator();
         String artist = "";
         if (rssItem.getDescription().contains("by")){
             StringBuffer stringBuffer = new StringBuffer(rssItem.getDescription());
-            artist = stringBuffer.substring(stringBuffer.indexOf("by") + 2,stringBuffer.indexOf(".",stringBuffer.indexOf("by")));
+            artist =
+                    stringBuffer.substring(stringBuffer.indexOf("by"));
+        }
+        else {
+            artist = "Unknown";
         }
 
         String source = rssItem.getEnclosures().get(0).getLink();
@@ -153,7 +161,6 @@ return tracks.iterator();
         // Since we don't have a unique ID in the server, we fake one using the hashcode of
         // the music source. In a real world app, this could come from the server.
         String id = String.valueOf(source.hashCode());
-
 
 
 
