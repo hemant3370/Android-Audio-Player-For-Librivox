@@ -16,24 +16,27 @@
 package com.example.android.AudioArchive;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.v4.media.MediaMetadataCompat;
 
-import com.anupcowkur.reservoir.Reservoir;
+import com.example.android.AudioArchive.model.Channel;
 import com.example.android.AudioArchive.ui.FullScreenPlayerActivity;
 import com.google.android.libraries.cast.companionlibrary.cast.CastConfiguration;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 
-import java.io.File;
-import java.io.IOException;
 
 /**
  * The {@link Application} for the uAmp application.
  */
+
+
 public class UAMPApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
         String applicationId = getResources().getString(R.string.cast_application_id);
+
         VideoCastManager.initialize(
                 getApplicationContext(),
                 new CastConfiguration.Builder(applicationId)
@@ -42,10 +45,6 @@ public class UAMPApplication extends Application {
                         .enableDebug()
                         .setTargetActivity(FullScreenPlayerActivity.class)
                         .build());
-        try {
-            Reservoir.init(this, 4096); //in bytes
-        } catch (Exception e) {
-            //failure
-        }
+
     }
 }

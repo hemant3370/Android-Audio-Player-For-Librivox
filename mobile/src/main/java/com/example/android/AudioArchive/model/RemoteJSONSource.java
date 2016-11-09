@@ -16,27 +16,19 @@
 
 package com.example.android.AudioArchive.model;
 
-import android.os.Environment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.util.Log;
 
-import com.anupcowkur.reservoir.Reservoir;
-import com.anupcowkur.reservoir.ReservoirPutCallback;
 import com.einmalfel.earl.EarlParser;
 import com.einmalfel.earl.Feed;
 import com.einmalfel.earl.RSSFeed;
 import com.einmalfel.earl.RSSItem;
-import com.example.android.AudioArchive.utils.DiskLruCache;
 import com.example.android.AudioArchive.utils.LogHelper;
-import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -52,7 +44,7 @@ public class RemoteJSONSource implements MusicProviderSource {
     private static final String TAG = LogHelper.makeLogTag(RemoteJSONSource.class);
 
     protected static final String CATALOG_URL =
-        "http://storage.googleapis.com/automotive-media/music.json";
+            "http://storage.googleapis.com/automotive-media/music.json";
 
 
 
@@ -73,21 +65,26 @@ public class RemoteJSONSource implements MusicProviderSource {
 //            int slashPos = CATALOG_URL.lastIndexOf('/');
 //            String path = CATALOG_URL.substring(0, slashPos + 1);
         ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
-         ArrayList<RSSItem> RssItems;
-        RssItems = fetchJSONFromUrl("https://archive.org/services/collection-rss.php?collection=librivoxaudio");
-        if(RssItems.size() > 0) {
-            for (RSSItem Mediaitem : RssItems) {
-                tracks.add(buildFromRSS(Mediaitem,"Librivox"));
-            }
-        }
-        RssItems = fetchJSONFromUrl("https://archive.org/services/collection-rss.php?collection=stream_only");
-        if(RssItems.size() > 0) {
-            for (RSSItem Mediaitem : RssItems) {
-                tracks.add(buildFromRSS(Mediaitem,"Random"));
-            }
-        }
+        ArrayList<RSSItem> RssItems;
 
-return tracks.iterator();
+
+                RssItems = fetchJSONFromUrl("https://archive.org/services/collection-rss.php?collection=librivoxaudio");
+                if (RssItems.size() > 0) {
+                    for (RSSItem Mediaitem : RssItems) {
+                        tracks.add(buildFromRSS(Mediaitem, "Librivox"));
+                    }
+                }
+
+
+
+            RssItems = fetchJSONFromUrl("https://archive.org/services/collection-rss.php?collection=stream_only");
+            if (RssItems.size() > 0) {
+                for (RSSItem Mediaitem : RssItems) {
+                    tracks.add(buildFromRSS(Mediaitem, "Random"));
+                }
+            }
+
+        return tracks.iterator();
     }
 
     private MediaMetadataCompat buildFromJSON(JSONObject json, String basePath) throws JSONException {
@@ -193,37 +190,26 @@ return tracks.iterator();
     private ArrayList<RSSItem> fetchJSONFromUrl(String urlString) {
         ArrayList<RSSItem> RssItems = new ArrayList<>();
 
-                try {
-                    InputStream inputStream = new URL(urlString).openConnection().getInputStream();
-                    Feed feed = EarlParser.parseOrThrow(inputStream, 0);
-                    // media and itunes RSS extensions allow to assign keywords to feed items
-                    if (RSSFeed.class.isInstance(feed)) {
-                        RSSFeed rssFeed = (RSSFeed) feed;
-                        for (RSSItem Mediaitem : rssFeed.items) {
-                            if (Mediaitem.media != null) {
-                                RssItems.add(Mediaitem);
-                            }
-                        }
-                        Reservoir.putAsync(urlString, RssItems, new ReservoirPutCallback() {
-                            @Override
-                            public void onSuccess() {
-                                //success
-                            }
-
-                            @Override
-                            public void onFailure(Exception e) {
-                                //error
-                            }
-                        });
+        try {
+            InputStream inputStream = new URL(urlString).openConnection().getInputStream();
+            Feed feed = EarlParser.parseOrThrow(inputStream, 0);
+            // media and itunes RSS extensions allow to assign keywords to feed items
+            if (RSSFeed.class.isInstance(feed)) {
+                RSSFeed rssFeed = (RSSFeed) feed;
+                for (RSSItem Mediaitem : rssFeed.items) {
+                    if (Mediaitem.media != null) {
+                        RssItems.add(Mediaitem);
                     }
-
-                } catch (Exception e) {
-                    Log.v("Error Parsing Data", e + "");
                 }
+            }
 
-
-            return RssItems;
+        } catch (Exception e) {
+            Log.v("Error Parsing Data", e + "");
         }
+
+
+        return RssItems;
+    }
 
 
 
