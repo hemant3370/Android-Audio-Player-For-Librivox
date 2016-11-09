@@ -17,6 +17,7 @@ package com.example.android.AudioArchive.ui;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -61,6 +62,7 @@ public class MediaBrowserFragment extends Fragment {
     private static final String ARG_MEDIA_ID = "media_id";
 
     private BrowseAdapter mBrowserAdapter;
+    ProgressDialog progressDialog;
     private String mMediaId;
     private MediaFragmentListener mMediaFragmentListener;
     private View mErrorView;
@@ -121,6 +123,7 @@ public class MediaBrowserFragment extends Fragment {
                     for (MediaBrowserCompat.MediaItem item : children) {
                         mBrowserAdapter.add(item);
                     }
+                    progressDialog.dismiss();
                     mBrowserAdapter.notifyDataSetChanged();
                 } catch (Throwable t) {
                     LogHelper.e(TAG, "Error on children loaded", t);
@@ -148,7 +151,10 @@ public class MediaBrowserFragment extends Fragment {
                              Bundle savedInstanceState) {
         LogHelper.d(TAG, "fragment.onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
-
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setIndeterminate(true);
+        progressDialog.setTitle("Fetching");
+        progressDialog.show();
         mErrorView = rootView.findViewById(R.id.playback_error);
         mErrorMessage = (TextView) mErrorView.findViewById(R.id.error_message);
 
